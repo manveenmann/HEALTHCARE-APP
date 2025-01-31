@@ -1,13 +1,18 @@
 {
-  "@@locale": "hi",
-  "signUp": "साइन अप करें",
-  "alreadyHaveAcc": "पहले से खाता है?",
-  "logIn": "लॉग इन करें",
-  "nameHint": "अपना नाम दर्ज करें",
-  "ageHint": "अपनी उम्र दर्ज करें",
-  "genderHint": "अपना लिंग दर्ज करें",
-  "emailHint": "अपना ईमेल दर्ज करें",
-  "passwordHint": "अपना पासवर्ड दर्ज करें",
-  "roleHint": "अपना रोल चुनें",
-  "btnSignUp": "साइन अप करें"
+  "signUp": "साइन अप",
+  "alreadyHaveAcc": "पहले से ही एक खाता है?",
+  "logIn": "लॉग इन",
+  "nameHint": "नाम",
+  "ageHint": "आयु",
+  "genderHint": "लिंग",
+  "emailHint": "ईमेल",
+  "passwordHint": "पासवर्ड",
+  "roleHint": "भूमिका",
+  "btnSignUp": "साइन अप",
+    "btnSignUp": "साइन अप करें",
+  "signIn": "साइन इन करें",
+  "dontHaveAcc": "कोई खाता नहीं है?",
+  "forgotPass": "पासवर्ड भूल गए?",
+  "signInPhone": "फोन नंबर से साइन इन करें"
+
 }

@@ -1,0 +1,17 @@
+{
+"signUp":"Sign Up",
+"alreadyHaveAcc":"Already have an account?",
+"logIn":"Log in",
+"nameHint":"Name",
+"ageHint":"Age",
+"genderHint":"Gender",
+"emailHint":"Email",
+"passwordHint":"Password",
+"roleHint":"Role",
+"btnSignUp":"Sign Up",
+"signIn":"Sign In",
+"dontHaveAcc":"Don't have an account?",
+"forgotPass":"Forgot Password?",
+"signInPhone":"Sign in using Phone Number"
+
+}

@@ -59,7 +59,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart'; // Corrected import
+import 'package:flutter_gen/gen_l10n/app_localizations.dart'; 
 import 'package:project_app/Anthropometric/bmichart.dart';
 import 'package:project_app/Authentication/loginpage.dart';
 import 'package:project_app/Authentication/registerpage.dart';
@@ -67,7 +67,9 @@ import 'package:project_app/Authentication/phone_auth_page.dart';
 import 'package:project_app/Authentication/password_reset_page.dart';
 import 'package:project_app/Home/doc.dart';
 import 'package:project_app/Home/patient.dart';
+import 'package:project_app/language_provider.dart';
 import 'package:project_app/splash.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -76,7 +78,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MainApp());
+  runApp(ChangeNotifierProvider(create: (context)=>LanguageProvider(),
+  child:const MainApp(),
+  ));
 }
 
 class MainApp extends StatelessWidget {
@@ -90,7 +94,7 @@ class MainApp extends StatelessWidget {
         Locale('en'), // English
         Locale('hi'), // Hindi
       ],
-      locale: const Locale('en'), // Default locale
+      locale: context.watch<LanguageProvider>().selectedLocale, // Default locale
       localizationsDelegates: const [
         AppLocalizations.delegate, // Generated localization delegate
         GlobalMaterialLocalizations.delegate,
