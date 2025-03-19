@@ -7,7 +7,6 @@ import 'package:project_app/Model/user_model.dart';
 import 'package:project_app/Utils/util.dart';
 import 'package:project_app/theme/app_colors.dart';
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -39,44 +38,48 @@ class _SplashState extends State<Splash> {
     super.initState();
 
     FirebaseAuth.instance.authStateChanges().listen((User? user) {
-      print("User Details: $user");
       if (user == null) {
         print('User is currently signed out!');
-        Timer(const Duration(seconds: 3), () {
-          Navigator.of(context).pushReplacementNamed("/register");
-        });
+        _navigateTo("/register", delay: 3);
       } else {
-        print('User is signed in!');
+        print('User is signed in! Fetching user details...');
         Util.UID = user.uid;
-        Timer(const Duration(seconds: 10), () {
-          final docRef =
-              FirebaseFirestore.instance.collection("users").doc(Util.UID);
-          docRef.get().then(
-            (DocumentSnapshot doc) {
-              final data = doc.data() as Map<String, dynamic>;
-              Util.user = AppUser.fromMap(data);
-              Navigator.of(context).pushReplacementNamed("/home");
-            },
-            onError: (e) => print("Error getting document: $e"),
-          );
+
+        FirebaseFirestore.instance
+            .collection("users")
+            .doc(Util.UID)
+            .get()
+            .then((DocumentSnapshot doc) {
+          if (doc.exists) {
+            final data = doc.data() as Map<String, dynamic>;
+            Util.user = UserModel.fromMap(data,doc.id); // ✅ Pass Firestore data to `fromMap()`
+            Util.checkUserRole(); // ✅ Debugging Role
+            _navigateTo("/home", delay: 2);
+          } else {
+            print("⚠️ User document not found in Firestore.");
+            _navigateTo("/register", delay: 2);
+          }
+        }).catchError((e) {
+          print("❌ Error getting user document: $e");
+          _navigateTo("/register", delay: 2);
         });
       }
     });
+  }
 
-    Timer(const Duration(seconds: 10), () {
-    
-
-      Navigator.of(context).pushReplacementNamed("/register");
-     
+  void _navigateTo(String route, {int delay = 3}) {
+    Future.delayed(Duration(seconds: delay), () {
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed(route);
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor:AppColors.backgroundColor,
+      backgroundColor: AppColors.backgroundColor,
       body: Center(
-       
         child: Image.asset('assets/images/logo.png'),
       ),
     );

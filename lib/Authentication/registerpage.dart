@@ -288,37 +288,37 @@
 //   }
 // }
 
-//  Purpose of the Page
-// The RegisterPage allows users to:
+// //  Purpose of the Page
+// // The RegisterPage allows users to:
 
-// Register with Firebase Authentication using their email and password.
-// Store additional user information (like name, role, age, and gender) in the Firestore database.
-// Choose a role (e.g., Patient, Doctor, Admin) and language (e.g., English or Hindi).
-// Navigate to the Login page if they already have an account.
+// // Register with Firebase Authentication using their email and password.
+// // Store additional user information (like name, role, age, and gender) in the Firestore database.
+// // Choose a role (e.g., Patient, Doctor, Admin) and language (e.g., English or Hindi).
+// // Navigate to the Login page if they already have an account.
 
-// When the "Sign Up" button is clicked, the app:
+// // When the "Sign Up" button is clicked, the app:
 
-// Collects input data from the fields.
-//  Registers the user using FirebaseAuth.createUserWithEmailAndPassword.
-// Stores additional user details (like name, age, gender, role) in the Firestore database.
+// // Collects input data from the fields.
+// //  Registers the user using FirebaseAuth.createUserWithEmailAndPassword.
+// // Stores additional user details (like name, age, gender, role) in the Firestore database.
 
-//  Workflow of Registration
-// User Fills Form:
+// //  Workflow of Registration
+// // User Fills Form:
 
-// Inputs name, email, password, age, gender, and selects a role.
-// Can also switch language if needed.
-// Validation:
+// // Inputs name, email, password, age, gender, and selects a role.
+// // Can also switch language if needed.
+// // Validation:
 
-// Ensures no fields are left empty.
-// Validates that a role is selected.
-// Firebase Operations:
+// // Ensures no fields are left empty.
+// // Validates that a role is selected.
+// // Firebase Operations:
 
-// Registers the user with Firebase Authentication.
-// Saves additional data in Firestore.
-// Redirect:
+// // Registers the user with Firebase Authentication.
+// // Saves additional data in Firestore.
+// // Redirect:
 
-// On success, redirects the user to the Login page.
-// On failure, displays error messages.
+// // On success, redirects the user to the Login page.
+// // On failure, displays error messages.
 
 
 
@@ -327,9 +327,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:project_app/language_provider.dart';
 import 'package:project_app/theme/app_colors.dart';
-import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -344,7 +342,9 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _genderController = TextEditingController();
+  
   String? _selectedRole;
+  String _selectedLanguage = 'en'; // Default language
 
   Future<void> register() async {
     String name = _nameController.text.trim();
@@ -354,7 +354,9 @@ class _RegisterPageState extends State<RegisterPage> {
     String gender = _genderController.text.trim();
 
     if (name.isEmpty || email.isEmpty || password.isEmpty || _selectedRole == null) {
-      print("Please fill in all fields and select a role.");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Please fill in all fields and select a role."))
+      );
       return;
     }
 
@@ -362,21 +364,33 @@ class _RegisterPageState extends State<RegisterPage> {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
 
+      // Store user data and role in Firestore
       await FirebaseFirestore.instance.collection("users").doc(userCredential.user!.uid).set({
         'name': name,
         'email': email,
         'role': _selectedRole,
         'age': age,
         'gender': gender,
-        'createdAt': DateTime.now(),
+        'createdAt': DateTime.now().toIso8601String(), // ✅ Convert timestamp to String
       });
 
-      print("User registered successfully!");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("User registered successfully!"))
+      );
+
       Navigator.pushReplacementNamed(context, "/login");
     } on FirebaseAuthException catch (e) {
-      print('Error: ${e.message}');
+      String errorMessage = 'An error occurred';
+      if (e.code == 'email-already-in-use') {
+        errorMessage = 'The email is already in use.';
+      } else if (e.code == 'weak-password') {
+        errorMessage = 'The password is too weak.';
+      } else {
+        errorMessage = 'Error: ${e.message}';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(errorMessage)));
     } catch (e) {
-      print('An unexpected error occurred: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Unexpected error: $e')));
     }
   }
 
@@ -385,25 +399,6 @@ class _RegisterPageState extends State<RegisterPage> {
     final localizations = AppLocalizations.of(context)!;
 
     return Scaffold(
-      appBar: AppBar(
-       backgroundColor: AppColors.backgroundColor,
-     actions: [
-  DropdownMenu(
-    initialSelection: context.watch<LanguageProvider>().selectedLocale.languageCode,
-    onSelected: (value) {
-     context.read<LanguageProvider>().changeLanguage(value as String);
-
-    },
-    dropdownMenuEntries: LanguageProvider.languages.map((language) {
-      return DropdownMenuEntry(
-        value: language['locale'],
-        label: language['name'],
-      );
-    }).toList(),
-  ),
-],
-
-      ),
       backgroundColor: AppColors.backgroundColor,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -411,48 +406,101 @@ class _RegisterPageState extends State<RegisterPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 20),
-            Text(localizations.signUp, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: AppColors.primaryColor)),
+
+            // 🌍 Language Selection Dropdown
+            DropdownButton<String>(
+              value: _selectedLanguage,
+              items: [
+                DropdownMenuItem(value: 'en', child: Text('English')),
+                DropdownMenuItem(value: 'hi', child: Text('हिंदी')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _selectedLanguage = value!;
+                  AppLocalizations.delegate.load(Locale(_selectedLanguage));
+                });
+              },
+            ),
+
+            const SizedBox(height: 20),
+
+            // 🎉 Title
+            Text(
+              localizations.signUp,
+              style: const TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primaryColor,
+              ),
+            ),
+
             const SizedBox(height: 8),
+
+            // 👤 Already Have Account? Login Button
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(localizations.alreadyHaveAcc, style: const TextStyle(fontSize: 14)),
                 TextButton(
                   onPressed: () => Navigator.pushReplacementNamed(context, "/login"),
-                  child: Text(localizations.logIn, style: const TextStyle(color: AppColors.secondaryColor, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    localizations.logIn,
+                    style: const TextStyle(
+                      color: AppColors.secondaryColor,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
+
             const SizedBox(height: 16),
-              // Centered Image
-              Center(
-                child: Image.asset(
-                  'assets/images/women-insulin.png', // Replace with your image
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
+
+            // 🖼️ Image
+            Center(
+              child: Image.asset(
+                'assets/images/women-insulin.png', // Replace with your image
+                height: 200,
+                fit: BoxFit.cover,
               ),
-              const SizedBox(height: 24),
+            ),
+
             const SizedBox(height: 24),
-            _buildTextField(_nameController, localizations.nameHint, Icons.person),
-            _buildTextField(_ageController, localizations.ageHint, Icons.cake),
-            _buildTextField(_genderController, localizations.genderHint, Icons.person_outline),
-            _buildTextField(_emailController, localizations.emailHint, Icons.email),
-            _buildTextField(_passwordController, localizations.passwordHint, Icons.lock, obscureText: true),
+
+            // 📝 Form Fields
+            buildTextField(localizations.nameHint, Icons.person, _nameController),
             const SizedBox(height: 16),
+            buildTextField(localizations.ageHint, Icons.cake, _ageController),
+            const SizedBox(height: 16),
+            buildTextField(localizations.genderHint, Icons.person_outline, _genderController),
+            const SizedBox(height: 16),
+            buildTextField(localizations.emailHint, Icons.email, _emailController),
+            const SizedBox(height: 16),
+            buildTextField(localizations.passwordHint, Icons.lock, _passwordController, obscureText: true),
+            const SizedBox(height: 16),
+
+            // 🎭 Role Selection
             DropdownButtonFormField<String>(
               value: _selectedRole,
-              items: ["Patient", "Doctor", "Admin"].map((role) => DropdownMenuItem(value: role, child: Text(role))).toList(),
+              items: ["Patient", "Doctor", "Admin"]
+                  .map((role) => DropdownMenuItem(value: role, child: Text(role)))
+                  .toList(),
               onChanged: (value) => setState(() => _selectedRole = value),
               decoration: InputDecoration(
                 labelText: localizations.roleHint,
                 filled: true,
                 fillColor: Colors.white,
                 prefixIcon: const Icon(Icons.person_outline, color: AppColors.primaryColor),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide.none,
+                ),
               ),
             ),
+
             const SizedBox(height: 32),
+
+            // 🚀 Register Button
             ElevatedButton(
               onPressed: register,
               style: ElevatedButton.styleFrom(
@@ -460,7 +508,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 80, vertical: 15),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
-              child: Text(localizations.btnSignUp, style: const TextStyle(fontSize: 16, color: Colors.white)),
+              child: Text(
+                localizations.btnSignUp,
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -468,18 +519,19 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String label, IconData icon, {bool obscureText = false}) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        decoration: InputDecoration(
-          labelText: label,
-          filled: true,
-          fillColor: Colors.white,
-          prefixIcon: Icon(icon, color: AppColors.primaryColor),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: BorderSide.none),
+  /// 📌 Helper Function to Build TextFields
+  Widget buildTextField(String labelText, IconData icon, TextEditingController controller, {bool obscureText = false}) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        labelText: labelText,
+        filled: true,
+        fillColor: Colors.white,
+        prefixIcon: Icon(icon, color: AppColors.primaryColor),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide.none,
         ),
       ),
     );

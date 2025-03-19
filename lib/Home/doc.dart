@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:project_app/Anthropometric/anthro.dart';
+import 'package:project_app/Discover/Medicine/med_screen.dart';
+import 'package:project_app/Discover/discover_page.dart';
 import 'package:project_app/theme/app_colors.dart';
 
 class doctorHome extends StatefulWidget {
@@ -17,9 +19,9 @@ class _doctorHomeState extends State<doctorHome> {
 
   // Widgets for different pages/screens
   List<Widget> widgets = [
-    AnthropometricDetailsPage(),
-    const Text("Turfs Page"),
-    const Text("Players Page"),
+    AnthropometricDetailsPage(),//1 screen 
+    DiscoverPage(),//discover screen 
+   MedicineListPage(),
     const Text("Profile Page"),
   ];
 

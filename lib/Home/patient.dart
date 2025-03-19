@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import FirebaseAuth for logout
 import 'package:project_app/Anthropometric/anthro.dart';
+import 'package:project_app/Discover/Medicine/add_med.dart';
+import 'package:project_app/Discover/Medicine/med_patient_screen.dart';
+import 'package:project_app/Discover/Medicine/med_screen.dart';
+import 'package:project_app/Discover/discover_page.dart';
 import 'package:project_app/theme/app_colors.dart'; // Import your custom theme if required
 
 class PatientHome extends StatefulWidget {
-  const PatientHome({super.key});
+  const PatientHome();
 
   @override
   State<PatientHome> createState() => _PatientHomeState();
@@ -16,7 +20,9 @@ class _PatientHomeState extends State<PatientHome> {
   // Widgets for different pages/screens
   List<Widget> widgets = [
     AnthropometricDetailsPage(),
-    const Text("Turfs Page"),
+    DiscoverPage(),
+    MedicineListPagePatient(),
+   
     const Text("Players Page"),
     const Text("Profile Page"),
   ];

@@ -1,62 +1,45 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+class UserModel {
+  final String uid;
+  final String name;
+  final String email;
+  final String role;
+  final String age;
+  final String gender;
+  final DateTime createdAt;
 
-class AppUser {
-  // Attributes
-  String fullName; 
-  String email; 
-  String phoneNumber; 
-  String password; 
-  String gender; 
-  int age; 
- 
-
-  // Constructor
-  AppUser({
-    required this.fullName,
+  UserModel({
+    required this.uid,
+    required this.name,
     required this.email,
-    required this.phoneNumber,
-    required this.password,
-    required this.gender,
+    required this.role,
     required this.age,
-   
+    required this.gender,
+    required this.createdAt,
   });
 
-  // Static method to return an empty AppUser object
-  static AppUser getAppUserEmptyObject() {
-    return AppUser(
-      fullName: "",
-      email: "",
-      phoneNumber: "",
-      password: "",
-      gender: "Select Gender",
-      age: 0,
-    
-    );
-  }
-
-  // toMap function for Firestore or other databases
+  // Convert object to Map for Firebase
   Map<String, dynamic> toMap() {
     return {
-      'fullName': fullName,
+      'uid': uid,
+      'name': name,
       'email': email,
-      'phoneNumber': phoneNumber,
-      'password': password,
-      'gender': gender,
+      'role': role,
       'age': age,
-    
+      'gender': gender,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
-  // fromMap factory method to create an AppUser from Firestore data
-  factory AppUser.fromMap(Map<String, dynamic> map) {
-    return AppUser(
-      fullName: map['fullName'] ?? "",
-      email: map['email'] ?? "",
-      phoneNumber: map['phoneNumber'] ?? "",
-      password: map['password'] ?? "",
-      gender: map['gender'] ?? "",
-      age: map['age'] ?? 0,
-      
+  // Convert Firebase document snapshot to UserModel
+  factory UserModel.fromMap(Map<String, dynamic> data, String documentId) {
+    return UserModel(
+      uid: documentId,
+      name: data['name'] ?? '',
+      email: data['email'] ?? '',
+      role: data['role'] ?? 'Patient', // Default role is Patient
+      age: data['age'] ?? '',
+      gender: data['gender'] ?? '',
+      createdAt: DateTime.parse(data['createdAt'] ?? DateTime.now().toIso8601String()),
     );
   }
 }

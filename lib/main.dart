@@ -108,7 +108,7 @@ class MainApp extends StatelessWidget {
         "/login": (context) => const LoginPage(),
         "/phoneAuth": (context) => const PhoneAuthPage(),
         "/reset": (context) => const PasswordResetPage(),
-        "/patientHome": (context) => const PatientHome(),
+       "/patientHome": (context) => const PatientHome(),
         "/doctorHome": (context) => const doctorHome(),
         "/bmichart": (context) => BMIChart(),
       },
