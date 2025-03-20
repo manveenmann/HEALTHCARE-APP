@@ -40,9 +40,9 @@ class _PatientHomeState extends State<PatientHome> {
        icon: Icon(Icons.explore_rounded),
       label: "Discover",
     ),
-    const BottomNavigationBarItem(
-      icon: Icon(Icons.sports_handball),
-      label: "Help",
+     const BottomNavigationBarItem(
+      icon: Icon(Icons.medication),
+      label: "Medicine",
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.person),

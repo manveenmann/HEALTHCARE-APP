@@ -39,8 +39,8 @@ class _doctorHomeState extends State<doctorHome> {
       label: "Discover",
     ),
     const BottomNavigationBarItem(
-      icon: Icon(Icons.broadcast_on_home_outlined),
-      label: "Help",
+      icon: Icon(Icons.medication),
+      label: "Medicine",
     ),
     const BottomNavigationBarItem(
       icon: Icon(Icons.person),
