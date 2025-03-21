@@ -254,9 +254,167 @@
 //     );
 //   }
 // }
+// import 'package:flutter/material.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+
+// class AddMealPage extends StatefulWidget {
+//   @override
+//   _AddMealPageState createState() => _AddMealPageState();
+// }
+
+// class _AddMealPageState extends State<AddMealPage> {
+//   final _formKey = GlobalKey<FormState>();
+//   final TextEditingController _bmiController = TextEditingController();
+//   final TextEditingController _activityController = TextEditingController();
+//   final TextEditingController _caloriesController = TextEditingController();
+//   final TextEditingController _preBreakfastController = TextEditingController();
+//   final TextEditingController _breakfastController = TextEditingController();
+//   final TextEditingController _lunchController = TextEditingController();
+//   final TextEditingController _dinnerController = TextEditingController();
+//   final TextEditingController _energyPer100gController = TextEditingController();
+
+//   String? _selectedDay;
+//   final List<String> days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+//   String? userRole;
+
+//   @override
+//   void initState() {
+//     super.initState();
+//     _checkUserRole();
+//   }
+
+//   Future<void> _checkUserRole() async {
+//     String uid = FirebaseAuth.instance.currentUser!.uid;
+//     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+//     if (userDoc.exists && userDoc['role'] == 'Doctor') {
+//       setState(() {
+//         userRole = 'Doctor';
+//       });
+//     } else {
+//       setState(() {
+//         userRole = 'Patient';
+//       });
+//     }
+//   }
+
+//   Future<void> _saveMeal() async {
+//     if (userRole != 'Doctor') {
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Only doctors can add meals!')));
+//       return;
+//     }
+
+//     if (_formKey.currentState!.validate()) {
+//       String uid = FirebaseAuth.instance.currentUser!.uid;
+//       await FirebaseFirestore.instance.collection('users').doc(uid).collection('meals').add({
+//         'day': _selectedDay,
+//         'BMI': _bmiController.text.trim(),
+//         'Activity': _activityController.text.trim(),
+//         'Recommended Calories': _caloriesController.text.trim(),
+//         'Pre-Breakfast': _preBreakfastController.text.trim(),
+//         'Breakfast': _breakfastController.text.trim(),
+//         'Lunch': _lunchController.text.trim(),
+//         'Dinner': _dinnerController.text.trim(),
+//         'Energy per 100g': _energyPer100gController.text.trim(),
+//         'timestamp': FieldValue.serverTimestamp(),
+//       });
+      
+//       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Meal added successfully!')));
+//       _clearFields();
+//     }
+//   }
+
+//   void _clearFields() {
+//     _bmiController.clear();
+//     _activityController.clear();
+//     _caloriesController.clear();
+//     _preBreakfastController.clear();
+//     _breakfastController.clear();
+//     _lunchController.clear();
+//     _dinnerController.clear();
+//     _energyPer100gController.clear();
+//     setState(() {
+//       _selectedDay = null;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     if (userRole == null) {
+//       return Scaffold(body: Center(child: CircularProgressIndicator()));
+//     }
+
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Add Meal Plan', style: TextStyle(color: Colors.white)),
+//         backgroundColor: Colors.blueAccent,
+//       ),
+//       body: userRole == 'Doctor'
+//           ? Padding(
+//               padding: EdgeInsets.all(16.0),
+//               child: Form(
+//                 key: _formKey,
+//                 child: SingleChildScrollView(
+//                   child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       _buildDropdownField('Select Day', _selectedDay, days, (value) => setState(() => _selectedDay = value)),
+//                       _buildTextField(_bmiController, 'BMI'),
+//                       _buildTextField(_activityController, 'Activity'),
+//                       _buildTextField(_caloriesController, 'Recommended Calories'),
+//                       _buildTextField(_preBreakfastController, 'Pre-Breakfast'),
+//                       _buildTextField(_breakfastController, 'Breakfast'),
+//                       _buildTextField(_lunchController, 'Lunch'),
+//                       _buildTextField(_dinnerController, 'Dinner'),
+//                       _buildTextField(_energyPer100gController, 'Energy per 100g (kcal)'),
+//                       SizedBox(height: 20),
+//                       ElevatedButton(
+//                         style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+//                         onPressed: _saveMeal,
+//                         child: Text('Save Meal Plan', style: TextStyle(color: Colors.white)),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             )
+//           : Center(
+//               child: Text(
+//                 'You do not have access to this page!',
+//                 style: TextStyle(fontSize: 18, color: Colors.red),
+//               ),
+//             ),
+//     );
+//   }
+
+//   Widget _buildDropdownField(String label, String? value, List<String> items, ValueChanged<String?> onChanged) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 10.0),
+//       child: DropdownButtonFormField<String>(
+//         value: value,
+//         decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
+//         items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+//         onChanged: onChanged,
+//         validator: (value) => value == null ? 'Select a $label' : null,
+//       ),
+//     );
+//   }
+
+//   Widget _buildTextField(TextEditingController controller, String label) {
+//     return Padding(
+//       padding: const EdgeInsets.only(bottom: 10.0),
+//       child: TextFormField(
+//         controller: controller,
+//         decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
+//         validator: (value) => value!.isEmpty ? 'Enter $label' : null,
+//       ),
+//     );
+//   }
+// }
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_app/theme/app_colors.dart';
 
 class AddMealPage extends StatefulWidget {
   @override
@@ -287,15 +445,9 @@ class _AddMealPageState extends State<AddMealPage> {
   Future<void> _checkUserRole() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
-    if (userDoc.exists && userDoc['role'] == 'Doctor') {
-      setState(() {
-        userRole = 'Doctor';
-      });
-    } else {
-      setState(() {
-        userRole = 'Patient';
-      });
-    }
+    setState(() {
+      userRole = userDoc.exists && userDoc['role'] == 'Doctor' ? 'Doctor' : 'Patient';
+    });
   }
 
   Future<void> _saveMeal() async {
@@ -318,7 +470,6 @@ class _AddMealPageState extends State<AddMealPage> {
         'Energy per 100g': _energyPer100gController.text.trim(),
         'timestamp': FieldValue.serverTimestamp(),
       });
-      
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Meal added successfully!')));
       _clearFields();
     }
@@ -333,9 +484,7 @@ class _AddMealPageState extends State<AddMealPage> {
     _lunchController.clear();
     _dinnerController.clear();
     _energyPer100gController.clear();
-    setState(() {
-      _selectedDay = null;
-    });
+    setState(() => _selectedDay = null);
   }
 
   @override
@@ -345,9 +494,10 @@ class _AddMealPageState extends State<AddMealPage> {
     }
 
     return Scaffold(
+      backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
         title: Text('Add Meal Plan', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: AppColors.primaryColor,
       ),
       body: userRole == 'Doctor'
           ? Padding(
@@ -368,10 +518,16 @@ class _AddMealPageState extends State<AddMealPage> {
                       _buildTextField(_dinnerController, 'Dinner'),
                       _buildTextField(_energyPer100gController, 'Energy per 100g (kcal)'),
                       SizedBox(height: 20),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
-                        onPressed: _saveMeal,
-                        child: Text('Save Meal Plan', style: TextStyle(color: Colors.white)),
+                      Center(
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.secondaryColor,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            padding: EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                          ),
+                          onPressed: _saveMeal,
+                          child: Text('Save Meal Plan', style: TextStyle(color: Colors.white, fontSize: 16)),
+                        ),
                       ),
                     ],
                   ),
@@ -381,7 +537,7 @@ class _AddMealPageState extends State<AddMealPage> {
           : Center(
               child: Text(
                 'You do not have access to this page!',
-                style: TextStyle(fontSize: 18, color: Colors.red),
+                style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
               ),
             ),
     );
@@ -392,7 +548,12 @@ class _AddMealPageState extends State<AddMealPage> {
       padding: const EdgeInsets.only(bottom: 10.0),
       child: DropdownButtonFormField<String>(
         value: value,
-        decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.white,
+        ),
         items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
         onChanged: onChanged,
         validator: (value) => value == null ? 'Select a $label' : null,
@@ -405,7 +566,12 @@ class _AddMealPageState extends State<AddMealPage> {
       padding: const EdgeInsets.only(bottom: 10.0),
       child: TextFormField(
         controller: controller,
-        decoration: InputDecoration(labelText: label, border: OutlineInputBorder()),
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          filled: true,
+          fillColor: Colors.white,
+        ),
         validator: (value) => value!.isEmpty ? 'Enter $label' : null,
       ),
     );

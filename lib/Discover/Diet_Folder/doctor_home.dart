@@ -1,7 +1,3 @@
-
-
-
-
 // import 'package:flutter/material.dart';
 // import 'package:project_app/Model/diet_model.dart';
 // import 'package:project_app/services/firebase_services.dart';
